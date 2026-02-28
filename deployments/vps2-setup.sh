@@ -73,7 +73,7 @@ if [ ! -f "$DEPLOY_DIR/.env" ]; then
 
     # Set default values
     echo "DATABASE_PATH=$DEPLOY_DIR/production_backup_for_testing.db" >> "$DEPLOY_DIR/.env"
-    echo "CHATBOT_PORT=8502" >> "$DEPLOY_DIR/.env"
+    echo "CHATBOT_PORT=8503" >> "$DEPLOY_DIR/.env"
     echo "CHATBOT_HOST=0.0.0.0" >> "$DEPLOY_DIR/.env"
 
     log_info "Created .env file with defaults"
@@ -138,7 +138,7 @@ if systemctl is-active --quiet "$SERVICE_NAME"; then
     echo "Deploy Directory: $DEPLOY_DIR"
     echo ""
     echo "Access URLs:"
-    echo "  Internal: http://localhost:8502"
+    echo "  Internal: http://localhost:8503"
     echo "  External: http://care.myhealthteam.org/chat"
     echo ""
     echo "Commands:"

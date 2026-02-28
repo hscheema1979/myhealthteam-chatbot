@@ -1,7 +1,7 @@
 """
 MyHealthTeam Chatbot Application
 Standalone Streamlit app for intelligent assistant
-Runs on port 8502 (separate from main app on port 8501)
+Runs on port 8503 (separate from main app and monitoring)
 
 Incorporates patterns from Gemini-CLI-UI:
 - Subprocess spawning with timeout and cleanup

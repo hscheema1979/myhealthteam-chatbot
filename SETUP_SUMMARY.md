@@ -85,10 +85,10 @@ def get_db_path() -> str:
 ```bash
 cd /home/ubuntu/myhealthteam-chatbot
 source venv/bin/activate
-streamlit run chatbot_app.py --server.port=8502
+streamlit run chatbot_app.py --server.port=8503
 ```
 
-Then open: http://localhost:8502
+Then open: http://localhost:8503
 
 ## Next Steps for VPS2 Deployment
 
@@ -181,8 +181,8 @@ Intent Parser (Classification)
 
 ## Access URLs (After VPS2 Deployment)
 
-- **Local Test**: http://localhost:8502
-- **VPS2 Internal**: http://178.16.140.23:8502
+- **Local Test**: http://localhost:8503
+- **VPS2 Internal**: http://178.16.140.23:8503
 - **External (via Nginx)**: http://care.myhealthteam.org/chat
 
 ## Support Files

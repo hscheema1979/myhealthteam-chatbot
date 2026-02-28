@@ -15,7 +15,7 @@ A standalone intelligent chatbot interface for MyHealthTeam coordinators and pro
 
 ## Tech Stack
 
-- **Frontend**: Streamlit (port 8502)
+- **Frontend**: Streamlit (port 8503)
 - **NLP Engine**: Gemini CLI (BAA compliant for healthcare)
 - **Database**: SQLite (test database only)
 - **Safety Layer**: Surgical action harness with schema validation
@@ -65,7 +65,7 @@ GEMINI_MODEL=gemini-pro
 GEMINI_TIMEOUT=30000
 
 # Application Settings
-CHATBOT_PORT=8502
+CHATBOT_PORT=8503
 CHATBOT_HOST=0.0.0.0
 
 # Security
@@ -82,7 +82,7 @@ SESSION_TIMEOUT=3600
 source venv/bin/activate
 
 # Run chatbot
-streamlit run chatbot_app.py --server.port=8502
+streamlit run chatbot_app.py --server.port=8503
 ```
 
 ### Production (systemd)
@@ -159,7 +159,7 @@ sudo systemctl restart myhealthteam-chatbot
 
 ```nginx
 location /chat {
-    proxy_pass http://localhost:8502;
+    proxy_pass http://localhost:8503;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";

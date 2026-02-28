@@ -10,7 +10,7 @@ showErrorDetails = false
 maxUploadSize = 200
 
 [server]
-port = 8502
+port = 8503
 headless = true
 enableCORS = false
 enableXsrfProtection = true

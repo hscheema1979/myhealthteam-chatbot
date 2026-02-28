@@ -67,7 +67,7 @@ nano .env  # Edit with your configuration
 Required .env settings:
 ```bash
 DATABASE_PATH=/var/www/myhealthteam-chatbot/production_backup_for_testing.db
-CHATBOT_PORT=8502
+CHATBOT_PORT=8503
 CHATBOT_HOST=0.0.0.0
 ```
 
@@ -99,7 +99,7 @@ sudo systemctl status myhealthteam-chatbot
 sudo journalctl -u myhealthteam-chatbot -f
 
 # Test locally
-curl http://localhost:8502
+curl http://localhost:8503
 
 # Test from external
 curl http://care.myhealthteam.org/chat
@@ -130,7 +130,7 @@ cat /var/www/myhealthteam-chatbot/.env | grep DATABASE_PATH
 
 After deployment, access the chatbot at:
 
-**Internal (VPS2):** http://localhost:8502
+**Internal (VPS2):** http://localhost:8503
 **External:** http://care.myhealthteam.org/chat
 
 ## Testing Natural Language Queries
@@ -181,7 +181,7 @@ sudo systemctl status myhealthteam-chatbot
 sudo journalctl -u myhealthteam-chatbot -n 50
 
 # Common issues:
-# - Port 8502 already in use
+# - Port 8503 already in use
 # - Virtual environment not set up
 # - Database not found
 ```
@@ -202,10 +202,10 @@ sudo chmod 640 /var/www/myhealthteam-chatbot/*.db
 sudo systemctl status myhealthteam-chatbot
 
 # Check if port is listening
-sudo netstat -tlnp | grep 8502
+sudo netstat -tlnp | grep 8503
 
 # Test direct connection
-curl http://localhost:8502
+curl http://localhost:8503
 ```
 
 ## Rollback

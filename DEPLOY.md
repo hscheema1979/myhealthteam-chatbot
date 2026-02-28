@@ -27,7 +27,7 @@ EOF
 
 ## What Gets Deployed
 
-- Chatbot application on port 8502
+- Chatbot application on port 8503
 - Nginx route at `/chat`
 - Systemd service for auto-start
 - Test database isolation
@@ -35,7 +35,7 @@ EOF
 ## Access After Deploy
 
 - **External**: http://care.myhealthteam.org/chat
-- **Internal**: http://178.16.140.23:8502
+- **Internal**: http://178.16.140.23:8503
 
 ## Commands
 
