@@ -11,6 +11,7 @@ def test_validated_action_formatting():
     action = ValidatedAction(
         action_type="INSERT",
         table_name="coordinator_tasks_2026_02",
+        target_id=None,
         changes={
             "coordinator_id": 1,
             "patient_id": 123,
@@ -33,6 +34,7 @@ def test_validated_action_with_warnings():
     action = ValidatedAction(
         action_type="INSERT",
         table_name="coordinator_tasks_2026_02",
+        target_id=None,
         changes={"coordinator_id": 1, "patient_id": 999},
         warnings=["Patient ID 999 not verified"]
     )
@@ -46,6 +48,7 @@ def test_validated_action_validation_errors():
     action = ValidatedAction(
         action_type="UNKNOWN",
         table_name="nonexistent_table",
+        target_id=None,
         changes={},
         validation_errors=["Table does not exist"]
     )
@@ -98,6 +101,7 @@ def test_transaction_executor_executes_insert(mock_db):
     action = ValidatedAction(
         action_type="INSERT",
         table_name="test_table",
+        target_id=None,
         changes={"col1": "value1"},
         sql_params=("value1",)
     )
@@ -120,6 +124,7 @@ def test_transaction_executor_rolls_back_on_error(mock_db):
     action = ValidatedAction(
         action_type="INSERT",
         table_name="test_table",
+        target_id=None,
         changes={"col1": "value1"}
     )
 
