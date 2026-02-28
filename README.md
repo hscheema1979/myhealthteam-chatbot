@@ -85,17 +85,17 @@ source venv/bin/activate
 streamlit run chatbot_app.py --server.port=8503
 ```
 
-### Production (systemd)
+### Production (PM2)
 
 ```bash
 # Install service
-sudo cp deployments/myhealthteam-chatbot.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable myhealthteam-chatbot
-sudo systemctl start myhealthteam-chatbot
+sudo cp deployments/myhealthteam-chatbot.service /etc/PM2/system/
+sudo pm2 daemon-reload
+sudo pm2 enable myhealthteam-chatbot
+sudo pm2 start myhealthteam-chatbot
 
 # Check status
-sudo systemctl status myhealthteam-chatbot
+sudo pm2 status myhealthteam-chatbot
 ```
 
 ## Usage Examples
@@ -152,7 +152,7 @@ cd /var/www/myhealthteam-chatbot
 git pull origin main
 
 # Restart service
-sudo systemctl restart myhealthteam-chatbot
+sudo pm2 restart myhealthteam-chatbot
 ```
 
 ### Nginx Configuration
@@ -174,7 +174,7 @@ location /chat {
 sudo journalctl -u myhealthteam-chatbot -f
 
 # Check service status
-sudo systemctl status myhealthteam-chatbot
+sudo pm2 status myhealthteam-chatbot
 
 # View database operations
 sqlite3 production_backup_for_testing.db "SELECT * FROM audit_log ORDER BY timestamp DESC LIMIT 20;"

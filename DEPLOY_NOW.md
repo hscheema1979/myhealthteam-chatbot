@@ -2,7 +2,7 @@
 
 ## Status: READY ✓
 
-The MyHealthTeam Chatbot is ready for deployment to VPS2.
+The MyHealthTeam Chatbot is ready for deployment to VPS2 with **PM2 process management**.
 
 ## One-Command Deploy
 
@@ -14,14 +14,15 @@ curl -sSL https://raw.githubusercontent.com/hscheema1979/myhealthteam-chatbot/ma
 
 ## What This Does
 
+- ✓ Installs Node.js and PM2 (if not present)
 - ✓ Clones chatbot from GitHub
 - ✓ Sets up Python virtual environment
 - ✓ Installs dependencies
 - ✓ Copies test database (isolated from production)
 - ✓ Configures environment for port 8503
-- ✓ Creates systemd service (auto-start)
+- ✓ Starts chatbot with PM2 (auto-restart on failure)
 - ✓ Configures Nginx route at `/chat`
-- ✓ Starts the chatbot service
+- ✓ Enables PM2 auto-start on boot
 
 ## Access After Deploy
 
@@ -36,20 +37,39 @@ curl -sSL https://raw.githubusercontent.com/hscheema1979/myhealthteam-chatbot/ma
 - **8502**: Monitoring dashboard (unchanged)
 - **8503**: Chatbot (new)
 
+## PM2 Management Commands
+
+```bash
+# Check status
+pm2 status
+
+# View logs (real-time)
+pm2 logs myhealthteam-chatbot
+
+# Restart app
+pm2 restart myhealthteam-chatbot
+
+# Stop app
+pm2 stop myhealthteam-chatbot
+
+# Monitor (interactive dashboard)
+pm2 monit
+
+# View detailed info
+pm2 describe myhealthteam-chatbot
+```
+
 ## Verification Commands
 
 ```bash
-# Check service status
-sudo systemctl status myhealthteam-chatbot
-
-# View logs
-sudo journalctl -u myhealthteam-chatbot -f
-
 # Test locally
 curl http://localhost:8503
 
-# Restart if needed
-sudo systemctl restart myhealthteam-chatbot
+# Check PM2 process list
+pm2 list
+
+# View resource usage
+pm2 monit
 ```
 
 ## Test Queries
@@ -67,7 +87,10 @@ Once deployed, try these:
 - ✓ No access to production data
 - ✓ All changes require confirmation
 - ✓ Complete audit logging
+- ✓ PM2 auto-restart on failure
+- ✓ PM2 log rotation
 
 ---
 
 **Repository**: https://github.com/hscheema1979/myhealthteam-chatbot
+**Process Manager**: PM2 with auto-restart and log rotation

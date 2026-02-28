@@ -11,25 +11,12 @@ SSH into VPS2 and run:
 curl -sSL https://raw.githubusercontent.com/hscheema1979/myhealthteam-chatbot/master/deployments/vps2-setup.sh | sudo bash
 ```
 
-Or manually:
-
-```bash
-# SSH to VPS2
-ssh ubuntu@178.16.140.23
-
-# Clone and setup
-sudo bash << 'EOF'
-git clone https://github.com/hscheema1979/myhealthteam-chatbot.git /var/www/myhealthteam-chatbot
-cd /var/www/myhealthteam-chatbot
-bash deployments/vps2-setup.sh
-EOF
-```
-
 ## What Gets Deployed
 
 - Chatbot application on port 8503
+- PM2 process manager (auto-restart on failure)
 - Nginx route at `/chat`
-- Systemd service for auto-start
+- PM2 auto-start on boot
 - Test database isolation
 
 ## Access After Deploy
@@ -37,20 +24,26 @@ EOF
 - **External**: http://care.myhealthteam.org/chat
 - **Internal**: http://178.16.140.23:8503
 
-## Commands
+## PM2 Management Commands
 
 ```bash
 # Check status
-sudo systemctl status myhealthteam-chatbot
+pm2 status
 
-# View logs
-sudo journalctl -u myhealthteam-chatbot -f
+# View logs (real-time)
+pm2 logs myhealthteam-chatbot
 
-# Restart service
-sudo systemctl restart myhealthteam-chatbot
+# Restart app
+pm2 restart myhealthteam-chatbot
 
-# Stop service
-sudo systemctl stop myhealthteam-chatbot
+# Stop app
+pm2 stop myhealthteam-chatbot
+
+# Monitor (interactive dashboard)
+pm2 monit
+
+# View detailed info
+pm2 describe myhealthteam-chatbot
 ```
 
 ## Test the Chatbot
