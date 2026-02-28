@@ -1,0 +1,35 @@
+[Unit]
+Description=MyHealthTeam Chatbot Service
+Documentation=https://github.com/myhealthteam/chatbot
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/myhealthteam-chatbot
+Environment="PATH=/var/www/myhealthteam-chatbot/venv/bin"
+EnvironmentFile=/var/www/myhealthteam-chatbot/.env
+ExecStart=/var/www/myhealthteam-chatbot/venv/bin/streamlit run chatbot_app.py \
+    --server.port=${CHATBOT_PORT} \
+    --server.address=${CHATBOT_HOST} \
+    --server.headless=true \
+    --server.enableCORS=false \
+    --server.enableXsrfProtection=true
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=myhealthteam-chatbot
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/myhealthteam-chatbot
+ReadWritePaths=/var/log/myhealthteam-chatbot
+
+[Install]
+WantedBy=multi-user.target
