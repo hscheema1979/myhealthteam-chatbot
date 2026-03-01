@@ -147,8 +147,8 @@ session_manager = ChatSessionManager()
 
 def check_authentication() -> Optional[int]:
     """Check if user is authenticated via shared session"""
-    # Get session from query params or cookies
-    session_id = st.query_params.get("session", None)
+    # Get session from query params (accept both 'session' and 'session_id')
+    session_id = st.query_params.get("session_id") or st.query_params.get("session")
 
     if not session_id:
         return None
