@@ -1,33 +1,27 @@
 # Complete Deployment Guide - VPS2 Test Instance
 
-## Quick Deploy (Port 8503)
+## ⚠️ IMPORTANT: TEST INSTANCE ONLY
 
-```bash
-ssh ubuntu@178.16.140.23
-
-# Deploy chatbot
-curl -sSL https://raw.githubusercontent.com/hscheema1979/myhealthteam-chatbot/master/deployments/vps2-setup.sh | sudo bash
-
-# Test access
-curl http://localhost:8503
-```
-
-Access: http://178.16.140.23:8503
+This chatbot is for **TESTING ONLY** and should:
+- ❌ NEVER be deployed to production (care.myhealthteam.org)
+- ❌ NEVER be accessible on the main site
+- ✅ ONLY run on test subdomain (test.myhealthteam.org)
+- ✅ ONLY use test database (production_backup_for_testing.db)
 
 ---
 
-## Subdomain Deploy (test.myhealthteam.org)
+## Quick Deploy (Subdomain)
 
 ### Step 1: Deploy Chatbot
 
 ```bash
 ssh ubuntu@178.16.140.23
 
-# Deploy with PM2
+# Deploy with PM2 to isolated workspace
 curl -sSL https://raw.githubusercontent.com/hscheema1979/myhealthteam-chatbot/master/deployments/vps2-setup.sh | sudo bash
 ```
 
-### Step 2: Configure Nginx for Subdomain
+### Step 2: Configure Nginx for Test Subdomain
 
 ```bash
 # On VPS2, copy the subdomain config
@@ -58,9 +52,24 @@ TTL: 300
 
 ### Step 4: Access
 
-**Main site**: http://test.myhealthteam.org
-**Chat path**: http://test.myhealthteam.org/chat
+**Test site**: http://test.myhealthteam.org/chat
 **Direct**: http://test.myhealthteam.org/ (redirects to /chat)
+
+---
+
+## Direct Port Access (For Testing)
+
+```bash
+ssh ubuntu@178.16.140.23
+
+# Deploy chatbot
+curl -sSL https://raw.githubusercontent.com/hscheema1979/myhealthteam-chatbot/master/deployments/vps2-setup.sh | sudo bash
+
+# Test access
+curl http://localhost:8503
+```
+
+**Access**: http://178.16.140.23:8503
 
 ---
 
@@ -82,13 +91,14 @@ pm2 logs myhealthteam-chatbot
 
 ---
 
-## Access Options
+## Access Options (TEST ONLY)
 
 | URL | Description |
 |-----|-------------|
-| http://178.16.140.23:8503 | Direct IP access |
-| http://care.myhealthteam.org/chat | Via main site |
-| http://test.myhealthteam.org/chat | Via subdomain (after DNS + Nginx config) |
+| http://178.16.140.23:8503 | Direct IP access (for testing) |
+| http://test.myhealthteam.org/chat | Test subdomain (primary access) |
+
+❌ **NOT AVAILABLE**: http://care.myhealthteam.org/chat (production - do not use)
 
 ---
 
@@ -106,9 +116,11 @@ pm2 monit                           # Monitor
 
 ## Security Checklist
 
-- ✅ Workspace: `/opt/test_myhealthteam/`
+- ✅ Workspace: `/opt/test_myhealthteam/` (isolated)
 - ✅ Database: `production_backup_for_testing.db` only
 - ✅ Port: 8503 (isolated)
+- ✅ Subdomain: test.myhealthteam.org (test only)
 - ✅ PM2: Auto-restart enabled
 - ✅ Gemini CLI: Test data only
-- ✅ No production access possible
+- ✅ No production access: Enforced in code
+- ❌ Production site: NOT configured

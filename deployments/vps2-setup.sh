@@ -126,16 +126,16 @@ log_info "Creating log directory..."
 mkdir -p /var/log/myhealthteam-chatbot
 chown www-data:www-data /var/log/myhealthteam-chatbot
 
-# Step 9: Configure Nginx
-log_info "Configuring Nginx..."
-if [ -f "$DEPLOY_DIR/deployments/nginx-chatbot.conf" ]; then
+# Step 9: Configure Nginx for TEST SUBDOMAIN ONLY
+log_info "Configuring Nginx for test subdomain..."
+if [ -f "$DEPLOY_DIR/deployments/nginx-test-subdomain.conf" ]; then
     if grep -q "include.*sites-enabled" /etc/nginx/nginx.conf; then
-        cp "$DEPLOY_DIR/deployments/nginx-chatbot.conf" "/etc/nginx/sites-available/chatbot.conf"
-        ln -sf /etc/nginx/sites-available/chatbot.conf /etc/nginx/sites-enabled/chatbot.conf
+        cp "$DEPLOY_DIR/deployments/nginx-test-subdomain.conf" "/etc/nginx/sites-available/test-myhealthteam"
+        ln -sf /etc/nginx/sites-available/test-myhealthteam /etc/nginx/sites-enabled/test-myhealthteam
 
         if nginx -t 2>/dev/null; then
             systemctl reload nginx
-            log_info "✓ Nginx configured successfully"
+            log_info "✓ Nginx configured for test.myhealthteam.org"
         else
             log_warn "Nginx config test failed, skipping reload"
         fi
@@ -198,9 +198,9 @@ if pm2 describe "$APP_NAME" &> /dev/null; then
         echo "  ✓ Database: $DEPLOY_DIR/production_backup_for_testing.db"
         echo "  ✓ No production access"
         echo ""
-        echo "Access URLs:"
-        echo "  Internal: http://localhost:8503"
-        echo "  External: http://care.myhealthteam.org/chat"
+        echo "Access URLs (TEST ONLY):"
+        echo "  Direct: http://178.16.140.23:8503"
+        echo "  Test Subdomain: http://test.myhealthteam.org/chat (requires DNS)"
         echo ""
         echo "PM2 Commands:"
         echo "  Status:  pm2 status"
