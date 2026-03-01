@@ -10,7 +10,7 @@ from contextlib import contextmanager
 
 
 # Test database path in workspace
-TEST_DB = "/opt/test_myhealthteam/production_backup_for_testing.db"
+TEST_DB = "/opt/test_myhealthteam/production.db"
 DEFAULT_DB_PATH = TEST_DB
 
 
