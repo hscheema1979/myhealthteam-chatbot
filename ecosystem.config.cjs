@@ -2,7 +2,7 @@ module.exports = {
   apps: [{
     name: 'myhealthteam-chatbot',
     script: './start-chatbot.sh',
-    cwd: '/var/www/myhealthteam-chatbot',
+    cwd: '/opt/test_myhealthteam/chatbot',
     interpreter: '/bin/bash',
     instances: 1,
     autorestart: true,
@@ -14,7 +14,8 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       CHATBOT_PORT: 8503,
-      CHATBOT_HOST: '0.0.0.0'
+      CHATBOT_HOST: '0.0.0.0',
+      WORKSPACE: '/opt/test_myhealthteam'
     },
     error_file: '/var/log/myhealthteam-chatbot/error.log',
     out_file: '/var/log/myhealthteam-chatbot/out.log',

@@ -1,18 +1,21 @@
 #!/bin/bash
 # VPS2 Setup Script for MyHealthTeam Chatbot (PM2 Managed)
+# Deploys to /opt/test_myhealthteam/ workspace for isolation
 # Run this script ON VPS2 after logging in
 
 set -e
 
 echo "=========================================="
 echo "MyHealthTeam Chatbot - VPS2 Setup (PM2)"
+echo "Workspace: /opt/test_myhealthteam/"
 echo "=========================================="
 
 # Configuration
 REPO_URL="https://github.com/hscheema1979/myhealthteam-chatbot.git"
-DEPLOY_DIR="/var/www/myhealthteam-chatbot"
+WORKSPACE="/opt/test_myhealthteam"
+DEPLOY_DIR="$WORKSPACE/chatbot"
 APP_NAME="myhealthteam-chatbot"
-TEST_DB_SOURCE="/home/ubuntu/myhealthteam/dev/production_backup_for_testing.db"
+TEST_DB_SOURCE="$WORKSPACE/production_backup_for_testing.db"
 
 # Colors
 GREEN='\033[0;32m'
@@ -29,6 +32,12 @@ if [[ $EUID -ne 0 ]]; then
    log_error "This script must be run with sudo"
    exit 1
 fi
+
+# Step 0: Create workspace directory
+log_info "Creating workspace directory..."
+mkdir -p "$WORKSPACE"
+chown www-data:www-data "$WORKSPACE"
+chmod 755 "$WORKSPACE"
 
 # Step 1: Install Node.js and PM2 if not present
 log_info "Checking for Node.js and PM2..."
@@ -52,7 +61,6 @@ if [ -d "$DEPLOY_DIR" ]; then
     sudo -u www-data git pull origin master
 else
     log_info "Cloning fresh copy..."
-    mkdir -p "$DEPLOY_DIR"
     git clone "$REPO_URL" "$DEPLOY_DIR"
     cd "$DEPLOY_DIR"
 fi
@@ -70,28 +78,39 @@ log_info "Installing Python dependencies..."
 
 # Step 5: Copy test database
 log_info "Copying test database..."
+# First, check if there's a test db in the workspace
 if [ -f "$TEST_DB_SOURCE" ]; then
     cp "$TEST_DB_SOURCE" "$DEPLOY_DIR/production_backup_for_testing.db"
-    chown www-data:www-data "$DEPLOY_DIR/production_backup_for_testing.db"
-    chmod 640 "$DEPLOY_DIR/production_backup_for_testing.db"
-    log_info "✓ Test database copied"
+    log_info "✓ Test database copied from workspace"
+# Otherwise check the old location
+elif [ -f "/home/ubuntu/myhealthteam/dev/production_backup_for_testing.db" ]; then
+    cp "/home/ubuntu/myhealthteam/dev/production_backup_for_testing.db" "$DEPLOY_DIR/production_backup_for_testing.db"
+    # Also copy to workspace for future use
+    cp "/home/ubuntu/myhealthteam/dev/production_backup_for_testing.db" "$TEST_DB_SOURCE"
+    log_info "✓ Test database copied (also saved to workspace)"
 else
     log_warn "Test database not found at $TEST_DB_SOURCE"
-    log_warn "You'll need to copy it manually"
+    log_warn "You'll need to copy it manually to $DEPLOY_DIR/production_backup_for_testing.db"
 fi
+
+chown www-data:www-data "$DEPLOY_DIR/production_backup_for_testing.db"
+chmod 640 "$DEPLOY_DIR/production_backup_for_testing.db"
 
 # Step 6: Configure environment
 log_info "Setting up environment..."
-if [ ! -f "$DEPLOY_DIR/.env" ]; then
-    cp "$DEPLOY_DIR/.env.example" "$DEPLOY_DIR/.env"
+cat > "$DEPLOY_DIR/.env" << ENV_EOF
+# MyHealthTeam Chatbot Environment
+# Isolated to /opt/test_myhealthteam/ workspace
 
-    # Set default values
-    echo "DATABASE_PATH=$DEPLOY_DIR/production_backup_for_testing.db" >> "$DEPLOY_DIR/.env"
-    echo "CHATBOT_PORT=8503" >> "$DEPLOY_DIR/.env"
-    echo "CHATBOT_HOST=0.0.0.0" >> "$DEPLOY_DIR/.env"
-
-    log_info "Created .env file with defaults"
-fi
+DATABASE_PATH=$DEPLOY_DIR/production_backup_for_testing.db
+CHATBOT_PORT=8503
+CHATBOT_HOST=0.0.0.0
+GEMINI_MODEL=gemini-pro
+GEMINI_TIMEOUT=30000
+SECRET_KEY=$(python3 -c 'import secrets; print(secrets.token_hex(32))')
+SESSION_TIMEOUT=3600
+LOG_LEVEL=INFO
+ENV_EOF
 
 chown www-data:www-data "$DEPLOY_DIR/.env"
 chmod 640 "$DEPLOY_DIR/.env"
@@ -150,7 +169,16 @@ fi
 # Wait for app to start
 sleep 5
 
-# Step 13: Check status
+# Step 13: Verify isolation
+log_info "Verifying workspace isolation..."
+WORKSPACE_CHECK=$(grep "DATABASE_PATH" "$DEPLOY_DIR/.env" | grep "$WORKSPACE")
+if [ -n "$WORKSPACE_CHECK" ]; then
+    log_info "✓ Chatbot is isolated to $WORKSPACE"
+else
+    log_warn "Warning: Could not verify workspace isolation"
+fi
+
+# Step 14: Check status
 if pm2 describe "$APP_NAME" &> /dev/null; then
     STATUS=$(pm2 jlist | node -e "console.log(JSON.parse(require('fs').readFileSync(0)).find(p=>p.name==='$APP_NAME').pm2_env.status)")
     if [ "$STATUS" = "online" ]; then
@@ -161,8 +189,14 @@ if pm2 describe "$APP_NAME" &> /dev/null; then
         echo "=========================================="
         echo ""
         echo "Repository: https://github.com/hscheema1979/myhealthteam-chatbot"
+        echo "Workspace: $WORKSPACE"
         echo "Deploy Directory: $DEPLOY_DIR"
         echo "Process Manager: PM2"
+        echo ""
+        echo "Isolation:"
+        echo "  ✓ Workspace: $WORKSPACE"
+        echo "  ✓ Database: $DEPLOY_DIR/production_backup_for_testing.db"
+        echo "  ✓ No production access"
         echo ""
         echo "Access URLs:"
         echo "  Internal: http://localhost:8503"

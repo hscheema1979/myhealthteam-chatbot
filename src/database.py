@@ -1,7 +1,7 @@
 """
 Database module for MyHealthTeam Chatbot
 
-Configured to use TEST DATABASE ONLY (production_backup_for_testing.db)
+Configured to use TEST DATABASE ONLY in isolated workspace /opt/test_myhealthteam/
 """
 import sqlite3
 import os
@@ -9,40 +9,53 @@ from typing import Optional
 from contextlib import contextmanager
 
 
-# TEST DATABASE PATH - Never points to production
-DEFAULT_DB_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    "production_backup_for_testing.db"
-)
+# Workspace isolation - chatbot only operates within this directory
+WORKSPACE = "/opt/test_myhealthteam"
+
+# Test database path within workspace
+DEFAULT_DB_PATH = os.path.join(WORKSPACE, "chatbot", "production_backup_for_testing.db")
 
 
 def get_db_path() -> str:
-    """Get database path from environment or use default test database"""
-    return os.environ.get(
-        "DATABASE_PATH",
-        DEFAULT_DB_PATH
-    )
+    """Get database path from environment or use default test database in workspace"""
+    db_path = os.environ.get("DATABASE_PATH", DEFAULT_DB_PATH)
+
+    # Enforce workspace isolation
+    if not db_path.startswith(WORKSPACE):
+        raise ValueError(
+            f"SECURITY ERROR: Chatbot must use database within workspace {WORKSPACE}!\n"
+            f"Current path: {db_path}\n"
+            f"Expected: {DEFAULT_DB_PATH}"
+        )
+
+    # Verify it's a test database
+    if "production_backup_for_testing" not in db_path and "test" not in db_path.lower():
+        raise ValueError(
+            f"SECURITY ERROR: Chatbot must use test database only!\n"
+            f"Current path: {db_path}"
+        )
+
+    return db_path
 
 
 @contextmanager
 def get_db_connection():
     """
-    Get a database connection to the TEST database
+    Get a database connection to the TEST database in workspace
 
     Yields:
         sqlite3.Connection: Database connection
 
     Raises:
         sqlite3.Error: If database connection fails
+        ValueError: If database is not in workspace or not a test database
     """
     db_path = get_db_path()
 
-    # Verify we're using the test database
-    if "production_backup_for_testing" not in db_path and "test" not in db_path.lower():
+    # Verify workspace isolation
+    if not db_path.startswith(WORKSPACE):
         raise ValueError(
-            f"SECURITY ERROR: Chatbot must use test database only!\n"
-            f"Current path: {db_path}\n"
-            f"Expected: production_backup_for_testing.db or test database"
+            f"SECURITY ERROR: Database must be in workspace {WORKSPACE}"
         )
 
     conn = sqlite3.connect(db_path)
@@ -56,7 +69,7 @@ def get_db_connection():
 
 def execute_query(query: str, params: tuple = (), fetch_one: bool = False):
     """
-    Execute a SQL query on the test database
+    Execute a SQL query on the test database in workspace
 
     Args:
         query: SQL query with placeholders
@@ -90,12 +103,12 @@ def table_exists(table_name: str) -> bool:
         return result is not None
 
 
-# Verify test database on import
+# Verify workspace on import
 if __name__ != "__main__":
     current_db = get_db_path()
-    if "production_backup_for_testing" not in current_db and "test" not in current_db.lower():
+    if not current_db.startswith(WORKSPACE):
         import warnings
         warnings.warn(
-            f"WARNING: Database path may not be a test database: {current_db}",
+            f"WARNING: Database path is not in workspace {WORKSPACE}: {current_db}",
             RuntimeWarning
         )
