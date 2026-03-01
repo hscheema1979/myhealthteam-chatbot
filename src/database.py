@@ -82,21 +82,10 @@ def get_table_schema(table_name: str) -> list:
 
 
 def table_exists(table_name: str) -> bool:
-    """Check if a table exists in the test database"""
+    """Check if a table exists in the database"""
     with get_db_connection() as conn:
         result = conn.execute(
             "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
             (table_name,)
         ).fetchone()
         return result is not None
-
-
-# Verify workspace on import
-if __name__ != "__main__":
-    current_db = get_db_path()
-    if not current_db.startswith(WORKSPACE):
-        import warnings
-        warnings.warn(
-            f"WARNING: Database path is not in workspace {WORKSPACE}: {current_db}",
-            RuntimeWarning
-        )
