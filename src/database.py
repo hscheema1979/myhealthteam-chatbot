@@ -1,8 +1,7 @@
 """
 Database module for MyHealthTeam Chatbot
 
-Supports both production and test databases.
-Default: production database at /opt/myhealthteam/production.db
+Uses TEST DATABASE ONLY in isolated workspace /opt/test_myhealthteam/
 """
 import sqlite3
 import os
@@ -10,23 +9,21 @@ from typing import Optional
 from contextlib import contextmanager
 
 
-# Database configuration
-PRODUCTION_DB = "/opt/myhealthteam/production.db"
-TEST_DB = "/opt/test_myhealthteam/chatbot/production_backup_for_testing.db"
-DEFAULT_DB_PATH = PRODUCTION_DB  # Default to production DB
+# Test database path in workspace
+TEST_DB = "/opt/test_myhealthteam/production_backup_for_testing.db"
+DEFAULT_DB_PATH = TEST_DB
 
 
 def get_db_path() -> str:
-    """Get database path from environment or use default"""
+    """Get database path from environment or use default test database"""
     db_path = os.environ.get("DATABASE_PATH", DEFAULT_DB_PATH)
 
-    # Validate database path is allowed
-    allowed_paths = [PRODUCTION_DB, TEST_DB]
-    if db_path not in allowed_paths:
+    # Enforce test database only
+    if db_path != TEST_DB:
         raise ValueError(
-            f"SECURITY ERROR: Database path not allowed!\n"
+            f"SECURITY ERROR: Chatbot must use test database only!\n"
             f"Current path: {db_path}\n"
-            f"Allowed paths: {', '.join(allowed_paths)}"
+            f"Required: {TEST_DB}"
         )
 
     return db_path
