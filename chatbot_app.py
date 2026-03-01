@@ -254,12 +254,11 @@ def main():
         return
 
     # Get user info
-    conn = get_db_connection()
-    user = conn.execute(
-        "SELECT email, first_name, last_name FROM users WHERE user_id = ?",
-        (user_id,)
-    ).fetchone()
-    conn.close()
+    with get_db_connection() as conn:
+        user = conn.execute(
+            "SELECT email, first_name, last_name FROM users WHERE user_id = ?",
+            (user_id,)
+        ).fetchone()
 
     # Get user roles
     user_role_ids = get_user_role_ids(user_id)
