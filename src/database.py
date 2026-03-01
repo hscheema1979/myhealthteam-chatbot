@@ -1,7 +1,8 @@
 """
 Database module for MyHealthTeam Chatbot
 
-Configured to use TEST DATABASE ONLY in isolated workspace /opt/test_myhealthteam/
+Supports both production and test databases.
+Default: production database at /opt/myhealthteam/production.db
 """
 import sqlite3
 import os
@@ -28,35 +29,22 @@ def get_db_path() -> str:
             f"Allowed paths: {', '.join(allowed_paths)}"
         )
 
-    # Verify it's a test database
-    if "production_backup_for_testing" not in db_path and "test" not in db_path.lower():
-        raise ValueError(
-            f"SECURITY ERROR: Chatbot must use test database only!\n"
-            f"Current path: {db_path}"
-        )
-
     return db_path
 
 
 @contextmanager
 def get_db_connection():
     """
-    Get a database connection to the TEST database in workspace
+    Get a database connection
 
     Yields:
         sqlite3.Connection: Database connection
 
     Raises:
         sqlite3.Error: If database connection fails
-        ValueError: If database is not in workspace or not a test database
+        ValueError: If database path is not allowed
     """
     db_path = get_db_path()
-
-    # Verify workspace isolation
-    if not db_path.startswith(WORKSPACE):
-        raise ValueError(
-            f"SECURITY ERROR: Database must be in workspace {WORKSPACE}"
-        )
 
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
