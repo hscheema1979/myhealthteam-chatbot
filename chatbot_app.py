@@ -248,11 +248,10 @@ def main():
 
     if not user_id:
         st.error("❌ Not authenticated. Please log in via the main dashboard.")
-        st.info("👉 Go to [care.myhealthteam.org](http://care.myhealthteam.org) to log in")
+        st.info("👉 Click the button below to log in:")
 
-        # Show login button
-        if st.button("🔐 Go to Login", use_container_width=True):
-            st.switch_page("http://care.myhealthteam.org")
+        # External link button to main app
+        st.link_button("🔐 Go to Login", "https://test.myhealthteam.org", use_container_width=True)
         return
 
     # Get user info
