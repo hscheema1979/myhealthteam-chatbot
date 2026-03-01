@@ -13,7 +13,7 @@ module.exports = {
     max_restarts: 10,
     env: {
       NODE_ENV: 'production',
-      CHATBOT_PORT: 8504,
+      CHATBOT_PORT: 8505,
       CHATBOT_HOST: '0.0.0.0',
       WORKSPACE: '/opt/test_myhealthteam'
     },
