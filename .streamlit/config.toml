@@ -15,6 +15,7 @@ headless = true
 enableCORS = false
 enableXsrfProtection = true
 maxUploadSize = 200
+baseUrlPath = "chat"
 
 [runner]
 fastReruns = false
