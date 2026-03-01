@@ -436,7 +436,7 @@ All changes require confirmation before saving.
 
         # Check if valid
         if not action.is_valid:
-            error_msg = "ERROR: " + ".join(action.validation_errors)
+            error_msg = "ERROR: " + ", ".join(action.validation_errors)
             return error_msg
 
         # Store for confirmation and show summary
