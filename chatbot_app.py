@@ -154,12 +154,11 @@ def check_authentication() -> Optional[int]:
         return None
 
     # Validate session against database
-    conn = get_db_connection()
-    session = conn.execute(
-        "SELECT user_id, expires_at FROM user_sessions WHERE session_id = ?",
-        (session_id,)
-    ).fetchone()
-    conn.close()
+    with get_db_connection() as conn:
+        session = conn.execute(
+            "SELECT user_id, expires_at FROM user_sessions WHERE session_id = ?",
+            (session_id,)
+        ).fetchone()
 
     if not session:
         return None
