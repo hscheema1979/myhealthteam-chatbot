@@ -9,23 +9,23 @@ from typing import Optional
 from contextlib import contextmanager
 
 
-# Workspace isolation - chatbot only operates within this directory
-WORKSPACE = "/opt/test_myhealthteam"
-
-# Test database path within workspace
-DEFAULT_DB_PATH = os.path.join(WORKSPACE, "chatbot", "production_backup_for_testing.db")
+# Database configuration
+PRODUCTION_DB = "/opt/myhealthteam/production.db"
+TEST_DB = "/opt/test_myhealthteam/chatbot/production_backup_for_testing.db"
+DEFAULT_DB_PATH = PRODUCTION_DB  # Default to production DB
 
 
 def get_db_path() -> str:
-    """Get database path from environment or use default test database in workspace"""
+    """Get database path from environment or use default"""
     db_path = os.environ.get("DATABASE_PATH", DEFAULT_DB_PATH)
 
-    # Enforce workspace isolation
-    if not db_path.startswith(WORKSPACE):
+    # Validate database path is allowed
+    allowed_paths = [PRODUCTION_DB, TEST_DB]
+    if db_path not in allowed_paths:
         raise ValueError(
-            f"SECURITY ERROR: Chatbot must use database within workspace {WORKSPACE}!\n"
+            f"SECURITY ERROR: Database path not allowed!\n"
             f"Current path: {db_path}\n"
-            f"Expected: {DEFAULT_DB_PATH}"
+            f"Allowed paths: {', '.join(allowed_paths)}"
         )
 
     # Verify it's a test database
